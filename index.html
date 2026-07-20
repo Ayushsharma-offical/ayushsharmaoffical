@@ -23,9 +23,101 @@
     --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'Inter', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
+
+    /* liquid glass tokens */
+    --glass-fill: rgba(255,255,255,0.045);
+    --glass-fill-strong: rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.14);
+    --glass-sheen: rgba(255,255,255,0.30);
+    --glass-blur: 22px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ===== LIQUID GLASS ===== */
+  .glass {
+    position: relative;
+    background:
+      linear-gradient(155deg, var(--glass-fill-strong) 0%, var(--glass-fill) 40%, rgba(255,255,255,0.02) 100%),
+      rgba(17, 22, 26, 0.55);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(165%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.16),
+      inset 0 0 0 1px rgba(255,255,255,0.02),
+      0 18px 40px -20px rgba(0,0,0,0.55);
+    isolation: isolate;
+  }
+  .glass::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(155deg, var(--glass-sheen), transparent 35%, transparent 70%, rgba(255,255,255,0.10));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.55;
+    z-index: 2;
+  }
+  .glass-shine {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 45%;
+    border-radius: inherit;
+    background: linear-gradient(180deg, rgba(255,255,255,0.10), transparent);
+    pointer-events: none;
+    z-index: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .glass { backdrop-filter: blur(12px) saturate(140%); -webkit-backdrop-filter: blur(12px) saturate(140%); }
+  }
+
+  /* ===== AMBIENT LIQUID-GLASS BLOBS (iridescent, like the reference image) ===== */
+  .ambient-blob {
+    position: fixed;
+    border-radius: 42% 58% 65% 35% / 45% 40% 60% 55%;
+    filter: blur(70px);
+    opacity: 0.3;
+    z-index: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    animation: blobMorph 16s ease-in-out infinite, blobDrift 24s ease-in-out infinite;
+  }
+  .ambient-blob.b1 {
+    width: 420px; height: 420px;
+    top: -140px; left: -120px;
+    background: linear-gradient(135deg, #ff9ecb, #a78bfa 45%, #7fd4c1 90%);
+  }
+  .ambient-blob.b2 {
+    width: 360px; height: 360px;
+    bottom: -120px; right: -100px;
+    background: linear-gradient(135deg, #7fd4c1, #ffd166 45%, #ff6b35 90%);
+    animation-delay: 2s, 4s;
+  }
+  .ambient-blob.b3 {
+    width: 260px; height: 260px;
+    top: 45%; left: 60%;
+    background: linear-gradient(135deg, #8fb8ff, #ff9ecb 60%);
+    opacity: 0.16;
+    animation-delay: 5s, 8s;
+  }
+  @keyframes blobMorph {
+    0%, 100% { border-radius: 42% 58% 65% 35% / 45% 40% 60% 55%; }
+    33% { border-radius: 60% 40% 38% 62% / 55% 62% 38% 45%; }
+    66% { border-radius: 38% 62% 55% 45% / 40% 45% 55% 60%; }
+  }
+  @keyframes blobDrift {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(30px, -24px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ambient-blob { animation: none; }
+  }
 
   html { scroll-behavior: smooth; }
 
@@ -72,9 +164,11 @@
     position: sticky;
     top: 0;
     z-index: 50;
-    background: rgba(10, 14, 15, 0.85);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(10,14,15,0.55));
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,0.06);
   }
   .nav-inner {
     max-width: 880px;
@@ -105,11 +199,8 @@
   }
 
   .terminal {
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 24px 64px -24px rgba(0,0,0,0.6);
     position: relative;
   }
 
@@ -118,8 +209,10 @@
     align-items: center;
     gap: 8px;
     padding: 12px 16px;
-    background: #161c20;
-    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid var(--glass-border);
+    position: relative;
+    z-index: 3;
   }
   .dot { width: 11px; height: 11px; border-radius: 50%; }
   .dot.red { background: #ff5f56; }
@@ -140,6 +233,8 @@
     grid-template-columns: 1fr;
     gap: 28px;
     align-items: center;
+    position: relative;
+    z-index: 3;
   }
 
   @media (min-width: 760px) {
@@ -289,9 +384,7 @@
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--text-dim);
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: 6px;
     padding: 4px 10px;
   }
   .section-head h2 {
@@ -464,29 +557,27 @@
 
   /* ===== PROJECT / BUILD CARDS (shared tilt mechanism) ===== */
   .tilt-card {
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 26px 28px;
     margin-bottom: 18px;
-    position: relative;
     transform-style: preserve-3d;
-    transition: transform 0.12s ease-out, border-color 0.2s;
+    transition: transform 0.12s ease-out, border-color 0.2s, background 0.2s;
     will-change: transform;
   }
-  .tilt-card:hover { border-color: var(--border-bright); }
+  .tilt-card:hover { border-color: var(--teal); }
 
-  .tilt-card::before {
+  .tilt-card::after {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 10px;
-    background: radial-gradient(circle 220px at var(--mx, 50%) var(--my, 50%), rgba(127,212,193,0.10), transparent 70%);
+    border-radius: 12px;
+    background: radial-gradient(circle 220px at var(--mx, 50%) var(--my, 50%), rgba(127,212,193,0.14), transparent 70%);
     opacity: 0;
     transition: opacity 0.25s;
     pointer-events: none;
+    z-index: 1;
   }
-  .tilt-card:hover::before { opacity: 1; }
+  .tilt-card:hover::after { opacity: 1; }
 
   .project-head {
     display: flex;
@@ -495,6 +586,8 @@
     gap: 12px;
     margin-bottom: 8px;
     flex-wrap: wrap;
+    position: relative;
+    z-index: 3;
   }
   .project-name {
     font-family: var(--font-mono);
@@ -508,8 +601,8 @@
     margin-right: 2px;
   }
   .project-links { display: flex; gap: 14px; font-family: var(--font-mono); font-size: 0.8rem; position: relative; z-index: 2; }
-  .project-desc { color: var(--text-dim); font-size: 0.94rem; margin-bottom: 14px; }
-  .tag-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .project-desc { color: var(--text-dim); font-size: 0.94rem; margin-bottom: 14px; position: relative; z-index: 3; }
+  .tag-row { display: flex; gap: 8px; flex-wrap: wrap; position: relative; z-index: 3; }
   .tag {
     font-family: var(--font-mono);
     font-size: 0.72rem;
@@ -538,13 +631,13 @@
   .build-icon-wrap {
     width: 64px;
     height: 64px;
-    border-radius: 8px;
-    background: var(--bg-raised-2);
-    border: 1px solid var(--border);
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    position: relative;
+    z-index: 3;
   }
   @media (max-width: 560px) { .build-icon-wrap { width: 48px; height: 48px; } }
   .build-icon-wrap svg { width: 32px; height: 32px; }
@@ -558,6 +651,8 @@
     font-size: 0.72rem;
     color: var(--teal);
     margin-top: 10px;
+    position: relative;
+    z-index: 3;
   }
   .build-status .pulse-dot {
     width: 6px; height: 6px; border-radius: 50%;
@@ -572,6 +667,97 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .build-status .pulse-dot { animation: none; }
+  }
+  .build-status.planned { color: var(--copper); }
+  .build-status.planned .pulse-dot { background: var(--copper); box-shadow: 0 0 0 0 rgba(215,168,110,0.6); animation: pulse-ring-copper 2s infinite; }
+  @keyframes pulse-ring-copper {
+    0% { box-shadow: 0 0 0 0 rgba(215,168,110,0.55); }
+    70% { box-shadow: 0 0 0 7px rgba(215,168,110,0); }
+    100% { box-shadow: 0 0 0 0 rgba(215,168,110,0); }
+  }
+
+  /* ===== DRONE SCROLL EASTER EGG ===== */
+  .drone-scene {
+    position: relative;
+    height: 120px;
+    margin: 0 0 10px;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .drone-svg {
+    position: absolute;
+    width: 64px;
+    left: 8%;
+    bottom: -30px;
+    opacity: 0;
+    filter: drop-shadow(0 8px 14px rgba(0,0,0,0.55));
+  }
+  .drone-svg.flying {
+    animation: droneFly 2.4s cubic-bezier(0.33,0,0.2,1) forwards;
+  }
+  @keyframes droneFly {
+    0%   { opacity: 0; bottom: -30px; left: 6%;  transform: rotate(-8deg) scale(0.75); }
+    10%  { opacity: 1; }
+    50%  { left: 42%; bottom: 58%; transform: rotate(5deg) scale(1.05); }
+    82%  { left: 50%; bottom: 90%; transform: rotate(-3deg) scale(1); opacity: 1; }
+    100% { left: 50%; bottom: 96%; transform: scale(0.35); opacity: 0; }
+  }
+  .drone-svg .rotor circle { animation: rotorSpin 0.12s linear infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes rotorSpin { to { transform: rotate(360deg); } }
+
+  .firework {
+    position: absolute;
+    left: 50%;
+    top: 2%;
+    width: 4px; height: 4px;
+  }
+  .firework span {
+    position: absolute;
+    left: 0; top: 0;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    opacity: 0;
+  }
+  .firework.burst span {
+    animation: fwPop 0.95s ease-out forwards;
+  }
+  @keyframes fwPop {
+    0%   { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--fx), var(--fy)) scale(0.25); }
+  }
+
+  .drone-reveal-name {
+    position: absolute;
+    left: 50%;
+    top: 0%;
+    transform: translate(-50%, -6px) scale(0.5);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(1.3rem, 5vw, 2rem);
+    color: var(--text);
+    text-shadow: 0 0 18px var(--accent), 0 0 42px var(--teal);
+    opacity: 0;
+    white-space: nowrap;
+  }
+  .drone-reveal-name.show {
+    animation: nameReveal 1.4s cubic-bezier(0.2,0.9,0.3,1.3) forwards;
+  }
+  @keyframes nameReveal {
+    0%   { opacity: 0; transform: translate(-50%, -6px) scale(0.3) rotate(-8deg); }
+    60%  { opacity: 1; transform: translate(-50%, -6px) scale(1.18) rotate(2deg); }
+    100% { opacity: 1; transform: translate(-50%, -6px) scale(1) rotate(0deg); }
+  }
+  .drone-scene-caption {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    margin-top: -6px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .drone-svg { opacity: 1; bottom: 96%; left: 50%; transform: scale(0.6); }
+    .drone-svg.flying { animation: none; }
+    .drone-reveal-name.show { animation: none; opacity: 1; transform: translate(-50%, -6px) scale(1); }
   }
 
   /* ===== AWARDS / SKILLS ===== */
@@ -642,12 +828,11 @@
 
   /* ===== CONTACT / FOOTER ===== */
   .contact-box {
-    background: var(--bg-raised);
-    border: 1px solid var(--border);
-    border-radius: 10px;
+    border-radius: 14px;
     padding: 36px;
     text-align: center;
   }
+  .contact-box h2, .contact-box p, .contact-links { position: relative; z-index: 3; }
   .contact-box h2 {
     font-family: var(--font-display);
     font-size: 1.8rem;
@@ -673,6 +858,10 @@
 </head>
 <body>
 
+<div class="ambient-blob b1"></div>
+<div class="ambient-blob b2"></div>
+<div class="ambient-blob b3"></div>
+
 <nav>
   <div class="nav-inner">
     <div class="nav-logo">ayush<span>.dev</span></div>
@@ -690,7 +879,8 @@
 
   <!-- HERO -->
   <header class="hero">
-    <div class="terminal">
+    <div class="terminal glass">
+      <span class="glass-shine"></span>
       <div class="terminal-bar">
         <span class="dot red"></span>
         <span class="dot yellow"></span>
@@ -745,7 +935,7 @@
   <!-- ABOUT -->
   <section id="about">
     <div class="section-head">
-      <span class="section-path">~/about</span>
+      <span class="section-path glass">~/about</span>
       <h2>A bit about me</h2>
     </div>
     <div class="about-grid">
@@ -792,11 +982,11 @@
   <!-- PROJECTS -->
   <section id="projects">
     <div class="section-head">
-      <span class="section-path">~/projects</span>
+      <span class="section-path glass">~/projects</span>
       <h2>Things I've shipped</h2>
     </div>
 
-    <div class="tilt-card">
+    <div class="tilt-card glass"><span class="glass-shine"></span>
       <div class="project-head">
         <span class="project-name">maru-travel-app</span>
         <div class="project-links">
@@ -817,7 +1007,27 @@
       </div>
     </div>
 
-    <div class="tilt-card">
+    <div class="tilt-card glass"><span class="glass-shine"></span>
+      <div class="project-head">
+        <span class="project-name">maru-travel-india</span>
+        <div class="project-links">
+          <a href="https://www.marutravel.in/" target="_blank" rel="noopener">live</a>
+        </div>
+      </div>
+      <p class="project-desc">
+        The public-facing website for Maru Travel India, a destination management company running
+        tours across India, Nepal, Bhutan, and Sri Lanka — built to showcase their tour categories,
+        luxury rail journeys, and destinations, with the client portal login wired straight into
+        the maru-travel-app above.
+      </p>
+      <div class="tag-row">
+        <span class="tag">Client Website</span>
+        <span class="tag">Multi-page</span>
+        <span class="tag">Responsive</span>
+      </div>
+    </div>
+
+    <div class="tilt-card glass"><span class="glass-shine"></span>
       <div class="project-head">
         <span class="project-name">attendify</span>
         <div class="project-links">
@@ -836,7 +1046,7 @@
       </div>
     </div>
 
-    <div class="tilt-card">
+    <div class="tilt-card glass"><span class="glass-shine"></span>
       <div class="project-head">
         <span class="project-name">sevayam</span>
         <div class="project-links">
@@ -855,37 +1065,38 @@
         <span class="tag">AI</span>
       </div>
     </div>
-  </section>
-  <div class="tilt-card">
-  <div class="project-head">
-    <span class="project-name">rudra-traders</span>
-    <div class="project-links">
-      <a href="https://rudratraders.vercel.app/" target="_blank" rel="noopener">live</a>
-      <a href="https://github.com/Ayushsharma-offical/rudratraders" target="_blank" rel="noopener">code</a>
+
+    <div class="tilt-card glass"><span class="glass-shine"></span>
+      <div class="project-head">
+        <span class="project-name">rudra-traders</span>
+        <div class="project-links">
+          <a href="https://rudratraders.vercel.app/" target="_blank" rel="noopener">live</a>
+          <a href="https://github.com/Ayushsharma-offical/rudratraders" target="_blank" rel="noopener">code</a>
+        </div>
+      </div>
+      <p class="project-desc">
+        A full-stack e-commerce platform built for Rudra Traders — a Bihar-based MSME machinery supplier
+        sourcing industrial equipment internationally and delivering it to rural doorsteps across the state.
+        The platform features PayPal payment integration, invoice generation, product catalogue management,
+        and an admin dashboard — helping small business owners in rural Bihar access affordable,
+        high-quality machinery and grow their enterprises.
+      </p>
+      <div class="tag-row">
+        <span class="tag">React</span>
+        <span class="tag">Vite</span>
+        <span class="tag">Firebase</span>
+        <span class="tag">PayPal</span>
+        <span class="tag">E-Commerce</span>
+        <span class="tag">Invoice Generation</span>
+      </div>
     </div>
-  </div>
-  <p class="project-desc">
-    A full-stack e-commerce platform built for Rudra Traders — a Bihar-based MSME machinery supplier 
-    sourcing industrial equipment internationally and delivering it to rural doorsteps across the state. 
-    The platform features PayPal payment integration, invoice generation, product catalogue management, 
-    and an admin dashboard — helping small business owners in rural Bihar access affordable, 
-    high-quality machinery and grow their enterprises.
-  </p>
-  <div class="tag-row">
-    <span class="tag">React</span>
-    <span class="tag">Vite</span>
-    <span class="tag">Firebase</span>
-    <span class="tag">PayPal</span>
-    <span class="tag">E-Commerce</span>
-    <span class="tag">Invoice Generation</span>
-  </div>
-</div>
+  </section>
 
   <!-- AUTOMATION (NEW) -->
   <section id="automation">
     <div class="section-head automation-head">
       <div>
-        <span class="section-path">~/automation</span>
+        <span class="section-path glass">~/automation</span>
         <h2>Hardware I've built and deployed</h2>
       </div>
       <div class="relay-stage" id="relayStage">
@@ -904,8 +1115,8 @@
       based on actual conditions instead of manual switches.
     </p>
 
-    <div class="tilt-card build-card">
-      <div class="build-icon-wrap">
+    <div class="tilt-card build-card glass"><span class="glass-shine"></span>
+      <div class="build-icon-wrap glass">
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M16 4 C10 4 6 8 6 13 C6 17 8.5 19.5 10 21.5 V25 H22 V21.5 C23.5 19.5 26 17 26 13 C26 8 22 4 16 4 Z" stroke="#7fd4c1" stroke-width="1.6"/>
           <path d="M13 28 H19" stroke="#7fd4c1" stroke-width="1.6" stroke-linecap="round"/>
@@ -932,8 +1143,8 @@
       </div>
     </div>
 
-    <div class="tilt-card build-card">
-      <div class="build-icon-wrap">
+    <div class="tilt-card build-card glass"><span class="glass-shine"></span>
+      <div class="build-icon-wrap glass">
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M16 3 C16 3 9 13 9 19 C9 23 12 26 16 26 C20 26 23 23 23 19 C23 13 16 3 16 3 Z" stroke="#7fd4c1" stroke-width="1.6"/>
           <path d="M5 22 C7 22 7 25 9 25 C11 25 11 22 13 22" stroke="#ff6b35" stroke-width="1.4" stroke-linecap="round"/>
@@ -959,8 +1170,8 @@
       </div>
     </div>
 
-    <div class="tilt-card build-card">
-      <div class="build-icon-wrap">
+    <div class="tilt-card build-card glass"><span class="glass-shine"></span>
+      <div class="build-icon-wrap glass">
         <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M11 5 H21 V9 H11 Z" stroke="#7fd4c1" stroke-width="1.6"/>
           <path d="M9 9 H23 L21 27 H11 L9 9 Z" stroke="#7fd4c1" stroke-width="1.6"/>
@@ -983,12 +1194,93 @@
         <div class="build-status"><span class="pulse-dot"></span> running at home</div>
       </div>
     </div>
+
+    <!-- scroll-triggered drone easter egg — flies only once you reach the sar-drone card -->
+    <div class="drone-scene" id="droneScene">
+      <svg class="drone-svg" id="droneSvg" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="30" cy="34" rx="16" ry="3" fill="#000" opacity="0.25"/>
+        <rect x="22" y="16" width="16" height="8" rx="2" fill="#161c20" stroke="#7fd4c1" stroke-width="1.2"/>
+        <circle cx="30" cy="20" r="2" fill="#ff6b35"/>
+        <line x1="10" y1="10" x2="22" y2="18" stroke="#516068" stroke-width="1.5"/>
+        <line x1="50" y1="10" x2="38" y2="18" stroke="#516068" stroke-width="1.5"/>
+        <line x1="10" y1="30" x2="22" y2="22" stroke="#516068" stroke-width="1.5"/>
+        <line x1="50" y1="30" x2="38" y2="22" stroke="#516068" stroke-width="1.5"/>
+        <g class="rotor"><circle cx="10" cy="10" r="6" fill="none" stroke="#7fd4c1" stroke-width="1.2"/></g>
+        <g class="rotor"><circle cx="50" cy="10" r="6" fill="none" stroke="#7fd4c1" stroke-width="1.2"/></g>
+        <g class="rotor"><circle cx="10" cy="30" r="6" fill="none" stroke="#7fd4c1" stroke-width="1.2"/></g>
+        <g class="rotor"><circle cx="50" cy="30" r="6" fill="none" stroke="#7fd4c1" stroke-width="1.2"/></g>
+      </svg>
+      <div class="firework" id="fireworkBurst"></div>
+      <div class="drone-reveal-name" id="droneRevealName">Ayush&nbsp;Sharma</div>
+    </div>
+    <p class="drone-scene-caption">psst — watch this corner 👀</p>
+
+    <div class="tilt-card build-card glass"><span class="glass-shine"></span>
+      <div class="build-icon-wrap glass">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="3.2" stroke="#7fd4c1" stroke-width="1.6"/>
+          <path d="M16 16 L6 8 M16 16 L26 8 M16 16 L6 24 M16 16 L26 24" stroke="#7fd4c1" stroke-width="1.4"/>
+          <circle cx="6" cy="8" r="3" stroke="#ff6b35" stroke-width="1.4"/>
+          <circle cx="26" cy="8" r="3" stroke="#ff6b35" stroke-width="1.4"/>
+          <circle cx="6" cy="24" r="3" stroke="#ff6b35" stroke-width="1.4"/>
+          <circle cx="26" cy="24" r="3" stroke="#ff6b35" stroke-width="1.4"/>
+          <rect x="13" y="19" width="6" height="5" rx="1" stroke="#7fd4c1" stroke-width="1.3"/>
+        </svg>
+      </div>
+      <div>
+        <div class="project-head">
+          <span class="project-name">sar-drone — search &amp; rescue</span>
+        </div>
+        <p class="project-desc">
+          A brushless-motor drone built for disaster response — think earthquakes, where responders
+          need to know where people are trapped before they go in. A Raspberry Pi and camera onboard
+          run a trained model that flags possible survivors in the footage and marks their
+          approximate location, for police or fire and rescue teams on the ground to act on.
+        </p>
+        <div class="tag-row">
+          <span class="tag copper">Raspberry Pi</span>
+          <span class="tag copper">Brushless motors</span>
+          <span class="tag">Computer vision</span>
+          <span class="tag">Disaster response</span>
+        </div>
+        <div class="build-status"><span class="pulse-dot"></span> running at home</div>
+      </div>
+    </div>
+
+    <div class="tilt-card build-card glass"><span class="glass-shine"></span>
+      <div class="build-icon-wrap glass">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 3 L28 9 V16 C28 23 22.5 27.5 16 29 C9.5 27.5 4 23 4 16 V9 Z" stroke="#7fd4c1" stroke-width="1.6"/>
+          <path d="M18 9 L12 17 H16 L14 23 L21 14 H17 Z" fill="#ff6b35" opacity="0.9"/>
+        </svg>
+      </div>
+      <div>
+        <div class="project-head">
+          <span class="project-name">fire-safety-relay — short circuit emergency response</span>
+        </div>
+        <p class="project-desc">
+          A safety layer for the home automation setup that watches for a short circuit or sudden
+          current spike. When it trips: power to the house lighting circuit cuts immediately, a
+          buzzer sounds, a servo-actuated fire extinguisher release fires near the panel, and an
+          automatic alert goes out toward emergency services. Wired in alongside the ESP32 relay
+          work above and active on the real panel.
+        </p>
+        <div class="tag-row">
+          <span class="tag copper">ESP32</span>
+          <span class="tag copper">Current sensing</span>
+          <span class="tag">Servo-triggered extinguisher</span>
+          <span class="tag">Auto shutoff</span>
+          <span class="tag">Emergency alert</span>
+        </div>
+        <div class="build-status"><span class="pulse-dot"></span> running at home</div>
+      </div>
+    </div>
   </section>
 
   <!-- AWARDS + SKILLS -->
   <section id="awards">
     <div class="section-head">
-      <span class="section-path">~/awards &amp; skills</span>
+      <span class="section-path glass">~/awards &amp; skills</span>
       <h2>Stuff I'm proud of / learning</h2>
     </div>
     <div class="two-col">
@@ -1010,15 +1302,22 @@
         <div class="file-item">
           <span class="file-icon">[live]</span>
           <div class="file-content">
-            <h3>3 deployed web apps</h3>
-            <p>Shipped and deployed Sevayam, Maru Travel, and Attendify, all live and working.</p>
+            <h3>5 deployed web apps</h3>
+            <p>Shipped and deployed Sevayam, the Maru Travel app + website, Attendify, and Rudra Traders, all live and working.</p>
           </div>
         </div>
         <div class="file-item">
           <span class="file-icon">[hw]</span>
           <div class="file-content">
-            <h3>3 ESP32 automation builds</h3>
-            <p>Home lighting, weather-based irrigation, and water dispensing — all running for real.</p>
+            <h3>5 ESP32 automation builds, all live</h3>
+            <p>Home lighting, weather-based irrigation, water dispensing, a search-and-rescue drone, and a short-circuit fire safety relay — all running for real.</p>
+          </div>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">[top100]</span>
+          <div class="file-content">
+            <h3>Hack Club Offtrack — sub-100 rank</h3>
+            <p>Ranked under 100 out of 28,000+ people in the Hack Club Slack community for Sevayam.</p>
           </div>
         </div>
       </div>
@@ -1036,7 +1335,7 @@
           <div class="skill-track"><div class="skill-fill" style="--w: 85%; width: 85%;"></div></div>
         </div>
         <div class="skill-bar-wrap">
-          <div class="skill-label"><span>Robotics &amp; ESP32</span><span class="skill-status">zonal winner, 3 builds live</span></div>
+          <div class="skill-label"><span>Robotics &amp; ESP32</span><span class="skill-status">zonal winner, 5 builds live</span></div>
           <div class="skill-track"><div class="skill-fill" style="--w: 78%; width: 78%;"></div></div>
         </div>
       </div>
@@ -1045,7 +1344,7 @@
 
   <!-- CONTACT -->
   <section id="contact">
-    <div class="contact-box">
+    <div class="contact-box glass"><span class="glass-shine"></span>
       <h2>Let's talk</h2>
       <p>Open to chatting about projects, opportunities, or just tech in general.</p>
       <div class="contact-links">
@@ -1209,6 +1508,49 @@
     relayStage.addEventListener('mouseleave', function() {
       relayCube.style.transform = '';
     });
+  }
+
+  // Drone scroll easter egg: flies up from the corner, then bursts into fireworks
+  // and reveals "Ayush Sharma" in lights.
+  var droneScene = document.getElementById('droneScene');
+  var droneSvg = document.getElementById('droneSvg');
+  var fireworkBurst = document.getElementById('fireworkBurst');
+  var droneRevealName = document.getElementById('droneRevealName');
+
+  if (droneScene && droneSvg && fireworkBurst && droneRevealName) {
+    if (reduceMotion) {
+      // Respect reduced motion: just show the result state, no flying/bursting.
+      droneRevealName.classList.add('show');
+    } else {
+      var droneTriggered = false;
+      var dio = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting && !droneTriggered) {
+            droneTriggered = true;
+            droneSvg.classList.add('flying');
+            dio.disconnect();
+          }
+        });
+      }, { threshold: 0.3 });
+      dio.observe(droneScene);
+
+      droneSvg.addEventListener('animationend', function() {
+        var colors = ['#ff6b35', '#7fd4c1', '#d7a86e', '#ffd166', '#ff5f9e', '#8fb8ff'];
+        var html = '';
+        for (var i = 0; i < 28; i++) {
+          var angle = Math.random() * Math.PI * 2;
+          var dist = 45 + Math.random() * 80;
+          var fx = Math.cos(angle) * dist;
+          var fy = Math.sin(angle) * dist;
+          var color = colors[i % colors.length];
+          var delay = (Math.random() * 0.18).toFixed(2);
+          html += '<span style="--fx:' + fx + 'px;--fy:' + fy + 'px;background:' + color + ';animation-delay:' + delay + 's;"></span>';
+        }
+        fireworkBurst.innerHTML = html;
+        fireworkBurst.classList.add('burst');
+        droneRevealName.classList.add('show');
+      });
+    }
   }
 })();
 </script>
